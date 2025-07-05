@@ -1,14 +1,16 @@
 // proxy-server.js
 const express = require("express");
-const fetch = require("node-fetch");
 const cors = require("cors");
+const axios = require("axios");
 const app = express();
 
 // Đọc JSON body
 app.use(express.json());
+
+// CORS: Cho phép mọi domain (hoặc chỉnh domain cụ thể nếu muốn)
 app.use(
   cors({
-    origin: "",
+    origin: "*", // Cho phép mọi domain
     credentials: true,
   })
 );
@@ -17,44 +19,30 @@ app.use(
 app.post("/api/proxy", async (req, res) => {
   try {
     const googleApiUrl =
-      "https://script.google.com/macros/s/AKfycbx1IbH-aFxytMz_gpALW2Pm009NBPr4ZdFh5hRS2Pc22bKC7kOq3LkguX1wSaLxJ2ki/exec"; // Thay bằng URL Web App của bạn
+      "https://script.google.com/macros/s/AKfycbx1IbH-aFxytMz_gpALW2Pm009NBPr4ZdFh5hRS2Pc22bKC7kOq3LkguX1wSaLxJ2ki/exec";
 
-    const response = await fetch(googleApiUrl, {
-      method: "POST",
+    const response = await axios.post(googleApiUrl, req.body, {
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(req.body),
     });
 
-    const data = await response.text(); // Google Apps Script đôi khi trả text
-    try {
-      res.json(JSON.parse(data)); // Nếu trả JSON hợp lệ
-    } catch (err) {
-      res.send(data); // Nếu không phải JSON (trả nguyên text)
-    }
+    res.json(response.data);
   } catch (err) {
-    console.error("Error:", err);
+    console.error("Error:", err.message);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-// Proxy GET (nếu cần)
+// Proxy GET
 app.get("/api/proxy", async (req, res) => {
   try {
     const googleApiUrl =
-      "https://script.google.com/macros/s/AKfycbx1IbH-aFxytMz_gpALW2Pm009NBPr4ZdFh5hRS2Pc22bKC7kOq3LkguX1wSaLxJ2ki/exec"; // Thay bằng URL Web App của bạn
+      "https://script.google.com/macros/s/AKfycbx1IbH-aFxytMz_gpALW2Pm009NBPr4ZdFh5hRS2Pc22bKC7kOq3LkguX1wSaLxJ2ki/exec";
 
-    const response = await fetch(googleApiUrl, {
-      method: "GET",
-    });
+    const response = await axios.get(googleApiUrl);
 
-    const data = await response.text();
-    try {
-      res.json(JSON.parse(data));
-    } catch (err) {
-      res.send(data);
-    }
+    res.json(response.data);
   } catch (err) {
-    console.error("Error:", err);
+    console.error("Error:", err.message);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
