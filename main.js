@@ -1,7 +1,7 @@
 // proxy-server.js
 const express = require("express");
 const fetch = require("node-fetch");
-import cors from "cors";
+const cors = require("cors");
 const app = express();
 
 // Đọc JSON body
