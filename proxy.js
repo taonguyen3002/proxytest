@@ -1,10 +1,17 @@
 // proxy-server.js
 const express = require("express");
 const fetch = require("node-fetch");
+import cors from "cors";
 const app = express();
 
 // Đọc JSON body
 app.use(express.json());
+app.use(
+  cors({
+    origin: "",
+    credentials: true,
+  })
+);
 
 // Proxy POST
 app.post("/api/proxy", async (req, res) => {
